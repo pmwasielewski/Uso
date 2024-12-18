@@ -1,7 +1,17 @@
+<<<<<<< HEAD
+=======
+import {Target} from './target.js';
+
+>>>>>>> 7ef9fdf (class Target)
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 7ef9fdf (class Target)
 window.requestAnimationFrame(draw);
     
 function resizeCanvas() {
@@ -13,11 +23,13 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
+var target1 = new Target(100, 100, 50);
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    target1.draw(ctx);
+    
     drawCrosshair(mouseCoords.x, mouseCoords.y, ctx);
-    
-    
     window.requestAnimationFrame(draw);
 }
 
@@ -33,10 +45,16 @@ function drawCrosshair(x, y, ctx) {
     ctx.lineTo(x + length, y);
     ctx.moveTo(x, y - length);
     ctx.lineTo(x, y + length);
+<<<<<<< HEAD
 
     ctx.moveTo(x - bigRadius, y);
     ctx.arc(x, y, bigRadius, 0, 2 * Math.PI);
     ctx.moveTo(x - smallRadius, y);
+=======
+    ctx.moveTo(x, y);
+
+    ctx.arc(x, y, bigRadius, 0, 2 * Math.PI);
+>>>>>>> 7ef9fdf (class Target)
     ctx.arc(x, y, smallRadius, 0, 2 * Math.PI);
 
     ctx.stroke();
