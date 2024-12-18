@@ -17,11 +17,18 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-var target1 = new Target(100, 100, 50);
+//var target1 = new Target(100, 100, 50);
+var targets = [];
+for (let i = 0; i < 50; i++) {
+    var target = new Target(targets, 50, canvas.width, canvas.height);
+    targets.push(target);
+}
+
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    target1.draw(ctx);
+    
+    for (let i = 0; i < targets.length; i++) targets[i].draw(ctx);
     
     drawCrosshair(mouseCoords.x, mouseCoords.y, ctx);
     window.requestAnimationFrame(draw);
