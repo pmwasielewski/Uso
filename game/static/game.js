@@ -3,6 +3,7 @@ import {Target} from './target.js';
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
+var sumOfPoints = 0;
 
 
 
@@ -71,4 +72,20 @@ canvas.addEventListener('mousemove', function(event) {
     //drawCrosshair(x, y, ctx);
 
     
+});
+
+canvas.addEventListener('click', function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
+    var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
+
+    for (let i = 0; i < targets.length; i++) {
+        var points = targets[i].hit(x, y);
+        if (points) {
+            console.log('hit');
+            sumOfPoints += points;
+            targets.splice(i, 1);
+            i--;
+        }
+    }
 });

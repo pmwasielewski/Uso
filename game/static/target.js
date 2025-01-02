@@ -28,6 +28,21 @@ export class Target {
         return Math.sqrt((this.x - x)**2 + (this.y - y)**2);
     }
 
+    hit(x, y) {
+        if (this.distance(x, y) > this.radius) 
+            return 0;
+        else {
+            var areas = this.circleNumber / 2;
+            var areaThickness = this.radius / areas;
+            var distance = this.distance(x, y);
+            var hitArea = Math.ceil(distance / areaThickness);
+            var points = areas - hitArea + 1;
+
+            console.log(points);
+            return points;
+        }
+    }
+
 
     draw(ctx) {
         var color_index = -1;
