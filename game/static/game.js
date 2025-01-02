@@ -1,10 +1,13 @@
-import {Target} from './target.js';
+import { Target } from './target.js';
+import { ClickTarget } from './clickTarget.js';
+import { DragTarget } from './dragTarget.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
+var previousMouseCoords = {x: 0, y: 0};
 var sumOfPoints = 0;
-
+var dragging = false;
 
 
 window.requestAnimationFrame(draw);
@@ -20,8 +23,8 @@ window.addEventListener('resize', resizeCanvas);
 
 //var target1 = new Target(100, 100, 50);
 var targets = [];
-for (let i = 0; i < 50; i++) {
-    var target = new Target(targets, 50, canvas.width, canvas.height);
+for (let i = 0; i < 3; i++) {
+    var target = new DragTarget(targets, 50, canvas.width, canvas.height);
     targets.push(target);
 }
 
@@ -66,11 +69,27 @@ canvas.addEventListener('mousemove', function(event) {
     var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
     var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
 
+    previousMouseCoords.x = mouseCoords.x;
+    previousMouseCoords.y = mouseCoords.y;
     mouseCoords.x = x;
     mouseCoords.y = y;
 
-    //drawCrosshair(x, y, ctx);
+    if (dragging) {
+        for (let i = 0; i < targets.length; i++) {
+            if (targets[i].dragging) {
+                console.log('LOOOL');
+                targets[i].dragged(mouseCoords.x, mouseCoords.y, previousMouseCoords.x, previousMouseCoords.y);
+                // ctx.strokeStyle = 'red';
+                // ctx.beginPath();
+                // ctx.moveTo(targets[i].x, targets[i].y);
+                // ctx.lineTo(mouseCoords.x, mouseCoords.y);
+                // ctx.stroke();
+                break;
+            }
+        }
+    }
 
+    //drawCrosshair(x, y, ctx);
     
 });
 
@@ -88,4 +107,28 @@ canvas.addEventListener('click', function(event) {
             i--;
         }
     }
+    console.log('click');
+});
+
+canvas.addEventListener('mousedown', function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
+    var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
+
+    for (let i = 0; i < targets.length; i++) {
+        if (targets[i].hit(x, y) && targets[i] instanceof DragTarget) {
+            console.log('dragging');
+            targets[i].dragged(x, y, previousMouseCoords.x, previousMouseCoords.y);
+            dragging = true;
+        }
+    }
+    console.log('mousedown');
+});
+
+canvas.addEventListener('mouseup', function(event) {
+    for (let i = 0; i < targets.length; i++) {
+        targets[i].dragging = false;
+    }
+    console.log('mouseup');
+    dragging = false;
 });
