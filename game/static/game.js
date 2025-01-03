@@ -23,7 +23,7 @@ window.addEventListener('resize', resizeCanvas);
 //var target1 = new Target(100, 100, 50);
 var targets = [];
 for (let i = 0; i < 3; i++) {
-    var target = new DragTarget(targets, 50, canvas.width, canvas.height);
+    var target = new DragTarget(targets, 100, canvas.width, canvas.height);
     targets.push(target);
 }
 
@@ -33,6 +33,7 @@ function draw() {
     
     for (let i = 0; i < targets.length; i++) targets[i].draw(ctx);
     
+    drawScore(sumOfPoints, ctx);
     drawCrosshair(mouseCoords.x, mouseCoords.y, ctx);
     window.requestAnimationFrame(draw);
 }
@@ -55,11 +56,15 @@ function drawCrosshair(x, y, ctx) {
     ctx.arc(x, y, smallRadius, 0, 2 * Math.PI);
 
     ctx.stroke();
-
-
-
-    
 }
+
+function drawScore(points, ctx) {
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'black';
+    ctx.fillText('Score: ' + points, 10, 30);
+}
+
+
 window.addEventListener('load', draw);
 
 canvas.addEventListener('mousemove', function(event) {
@@ -71,17 +76,15 @@ canvas.addEventListener('mousemove', function(event) {
     mouseCoords.x = x;
     mouseCoords.y = y;
 
-    if (dragging) {
-        for (let i = 0; i < targets.length; i++) {
-            if (targets[i].dragging) {
-                console.log('LOOOL');
-                targets[i].dragged(mouseCoords.x, mouseCoords.y);
-                break;
-            }
+    for (let i = 0; i < targets.length; i++) {
+        var points = targets[i].update('move', mouseCoords.x, mouseCoords.y);
+        if (points != null) {
+            sumOfPoints += points;
+            break;
         }
     }
+    targets = targets.filter(target => target.alive == true);
 
-    //drawCrosshair(x, y, ctx);
     
 });
 
@@ -89,38 +92,29 @@ canvas.addEventListener('click', function(event) {
     var rect = canvas.getBoundingClientRect();
     var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
     var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
-
-    for (let i = 0; i < targets.length; i++) {
-        var points = targets[i].hit(x, y);
-        if (points) {
-            console.log('hit');
-            sumOfPoints += points;
-            targets.splice(i, 1);
-            i--;
-        }
-    }
-    console.log('click');
 });
 
 canvas.addEventListener('mousedown', function(event) {
-    var rect = canvas.getBoundingClientRect();
-    var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
-    var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
-
     for (let i = 0; i < targets.length; i++) {
-        if (targets[i].hit(x, y) && targets[i] instanceof DragTarget) {
-            console.log('dragging');
-            targets[i].dragged(x, y);
-            dragging = true;
+        var points = targets[i].update('mouseDown', mouseCoords.x, mouseCoords.y);
+        if (points != null) {
+            sumOfPoints += points;
+            break;
+        }
+        if (i == targets.length - 1) {
+            console.log('miss');
         }
     }
-    console.log('mousedown');
+    targets = targets.filter(target => target.alive == true);
 });
 
 canvas.addEventListener('mouseup', function(event) {
     for (let i = 0; i < targets.length; i++) {
-        targets[i].dragging = false;
+        var points = targets[i].update('mouseUp', mouseCoords.x, mouseCoords.y);
+        if (points != null) {
+            sumOfPoints += points;
+            break;
+        }
     }
-    console.log('mouseup');
-    dragging = false;
+    targets = targets.filter(target => target.alive == true);
 });

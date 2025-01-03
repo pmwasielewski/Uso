@@ -39,6 +39,20 @@ export class ClickTarget extends Target {
         }
     }
 
+    update(action, x, y) {
+        switch (action) {
+            case 'mouseDown':
+                if (this.hit(x, y)) {
+                    var points = this.hit(x, y);
+                    this.alive = false;
+                    return points;
+                }
+                return null;
+            default:
+                return null;
+        }
+    }
+
 
     draw(ctx) {
         var color_index = -1;

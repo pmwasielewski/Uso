@@ -35,14 +35,16 @@ export class DragTarget extends ClickTarget {
         console.log(this.prefixSumOfDistances);
     }
 
-    hit(x, y) {
-        if (super.hit(x, y)) {
-            console.log(this.bezierPoints);
+    awardPoints() {
+        var points = Math.ceil(5 * (this.currentBezierPointIndex / this.bezierPointsNumber));
+        if (this.currentBezierPointIndex == this.bezierPointsNumber - 1) {
+            points *= 2;
+        }
+        else if (this.currentBezierPointIndex == 0) {
+            points = 1;
         }
 
-        return super.hit(x, y);
-
-        
+        return points;
     }
 
     closestBezierPoint(x, y) {
@@ -110,8 +112,41 @@ export class DragTarget extends ClickTarget {
         return [x, y];
     }
 
+    update(action, x, y) {
+        switch (action) {
+            case 'move':
+                if (this.dragging) {
+                    this.dragged(x, y);
+
+                    if (!this.dragging) {
+                        this.alive = false;
+                        return this.awardPoints();
+                    }
+                    return 0;
+                }
+                return null;
+            case 'mouseDown':
+                if (super.hit(x, y)) {
+                    this.dragged(x, y);
+                    this.dragging = true;
+                    return 0;
+                }
+                return null;
+
+            case 'mouseUp':
+                if (this.dragging) {
+                    this.alive = false;
+                    return this.awardPoints();
+                }
+                return null;
+            default:
+                return null;
+            }
+    }
+
     draw (ctx) {
         ctx.strokeStyle = 'black';
+        ctx.lineWidth = this.radius;
         ctx.beginPath();
         ctx.moveTo(this.bezierControlPoints[0][0], this.bezierControlPoints[0][1]);
         ctx.quadraticCurveTo(this.bezierControlPoints[1][0], this.bezierControlPoints[1][1], this.bezierControlPoints[2][0], this.bezierControlPoints[2][1]);

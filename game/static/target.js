@@ -7,6 +7,7 @@ export class Target {
         this.radius = radius;
         this.circleNumber = 10;
         this.colors = ['white', 'black', 'blue', 'orange', 'yellow']
+        this.alive = true;
 
     }
 
