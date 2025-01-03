@@ -14,9 +14,11 @@ export class DragTarget extends ClickTarget {
             this.bezierControlPoints.push([Math.random() * width, Math.random() * height]);
         }
 
+        this.currentBezierPointIndex = 0;
         this.bezierPointsNumber = 1000;
         this.bezierPoints = [];
         this.prefixSumOfDistances = [0];
+        this.sufixSumOfDistances = new Array(this.bezierPointsNumber).fill(0);
         for (let i = 0; i < this.bezierPointsNumber; i++) {
             this.bezierPoints.push(this.getBezierPoint(i / this.bezierPointsNumber));
 
@@ -25,6 +27,12 @@ export class DragTarget extends ClickTarget {
             }
 
         }
+
+        for (let i = this.bezierPointsNumber - 2; i >= 0; i--) {
+            this.sufixSumOfDistances[i] = this.sufixSumOfDistances[i + 1] + Target.distanceOfTwoPoints(this.bezierPoints[i][0], this.bezierPoints[i][1], this.bezierPoints[i + 1][0], this.bezierPoints[i + 1][1]);
+        }
+        console.log(this.sufixSumOfDistances);
+        console.log(this.prefixSumOfDistances);
     }
 
     hit(x, y) {
@@ -41,21 +49,45 @@ export class DragTarget extends ClickTarget {
         var minDistance = Target.distanceOfTwoPoints(x, y, this.x, this.y);
         var pointX = this.x;
         var pointY = this.y;
+        var mouseDistance = Target.distanceOfTwoPoints(x, y, this.x, this.y);
+        var bestIndex = this.currentBezierPointIndex;
 
-        for (let i = 0; i < this.bezierPointsNumber; i++) {
+        for (let i = this.currentBezierPointIndex; i >= 0; i--) {
+            var estimatedDistance = this.sufixSumOfDistances[i] - this.sufixSumOfDistances[this.currentBezierPointIndex];
+            if (estimatedDistance > mouseDistance)  {
+                break;
+            }
+            
             var distance = Target.distanceOfTwoPoints(x, y, this.bezierPoints[i][0], this.bezierPoints[i][1]);
             if (distance < minDistance) {
-                console.log("YATYYYYY");
                 minDistance = distance;
                 pointX = this.bezierPoints[i][0];
                 pointY = this.bezierPoints[i][1];
+                bestIndex = i;
             }
         }
 
-        return [pointX, pointY];
+        for (let i = this.currentBezierPointIndex; i < this.bezierPointsNumber; i++) {
+            var estimatedDistance = this.prefixSumOfDistances[i] - this.prefixSumOfDistances[this.currentBezierPointIndex];
+            if (estimatedDistance > mouseDistance) {
+                break;
+            }
+
+            var distance = Target.distanceOfTwoPoints(x, y, this.bezierPoints[i][0], this.bezierPoints[i][1]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                pointX = this.bezierPoints[i][0];
+                pointY = this.bezierPoints[i][1];
+                bestIndex = i;
+            }
+        }
+
+        this.currentBezierPointIndex = bestIndex;
+        this.x = pointX;
+        this.y = pointY;
     }
 
-    dragged(x, y, previousX, previousY) {
+    dragged(x, y) {
         if (!this.dragging) {
             this.dragging = true;
             return;
@@ -66,9 +98,7 @@ export class DragTarget extends ClickTarget {
             return;
         }
 
-        var closestPoint = this.closestBezierPoint(x, y);
-        this.x = closestPoint[0];
-        this.y = closestPoint[1];
+        this.closestBezierPoint(x, y);
     }
 
     getBezierPoint(t) {

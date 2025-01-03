@@ -5,7 +5,6 @@ import { DragTarget } from './dragTarget.js';
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
-var previousMouseCoords = {x: 0, y: 0};
 var sumOfPoints = 0;
 var dragging = false;
 
@@ -69,8 +68,6 @@ canvas.addEventListener('mousemove', function(event) {
     var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
     var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
 
-    previousMouseCoords.x = mouseCoords.x;
-    previousMouseCoords.y = mouseCoords.y;
     mouseCoords.x = x;
     mouseCoords.y = y;
 
@@ -78,12 +75,7 @@ canvas.addEventListener('mousemove', function(event) {
         for (let i = 0; i < targets.length; i++) {
             if (targets[i].dragging) {
                 console.log('LOOOL');
-                targets[i].dragged(mouseCoords.x, mouseCoords.y, previousMouseCoords.x, previousMouseCoords.y);
-                // ctx.strokeStyle = 'red';
-                // ctx.beginPath();
-                // ctx.moveTo(targets[i].x, targets[i].y);
-                // ctx.lineTo(mouseCoords.x, mouseCoords.y);
-                // ctx.stroke();
+                targets[i].dragged(mouseCoords.x, mouseCoords.y);
                 break;
             }
         }
@@ -118,7 +110,7 @@ canvas.addEventListener('mousedown', function(event) {
     for (let i = 0; i < targets.length; i++) {
         if (targets[i].hit(x, y) && targets[i] instanceof DragTarget) {
             console.log('dragging');
-            targets[i].dragged(x, y, previousMouseCoords.x, previousMouseCoords.y);
+            targets[i].dragged(x, y);
             dragging = true;
         }
     }
