@@ -61,7 +61,8 @@ export class ClickTarget extends Target {
         for (let i = 0; i < this.circleNumber; i++) {
             if (i % 2 == 0){
                 color_index++;
-                var gradient = ctx.createRadialGradient(this.x, this.y, radius_i - 2*circleThickness, this.x, this.y, radius_i);
+                var r0 = Math.max(0, radius_i - 2*circleThickness);
+                var gradient = ctx.createRadialGradient(this.x, this.y, r0, this.x, this.y, radius_i);
                 gradient.addColorStop(1, this.colors[color_index]);
                 if (color_index + 1 < this.colors.length) {
                     gradient.addColorStop(0, this.colors[color_index + 1]);

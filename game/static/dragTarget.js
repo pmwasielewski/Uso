@@ -160,6 +160,18 @@ export class DragTarget extends ClickTarget {
         super.draw(ctx);
     }
 
+    resize(width, height) {
+        for (let i = 0; i < 3; i++) {
+            this.bezierControlPoints[i][0] *= width / this.width;
+            this.bezierControlPoints[i][1] *= height / this.height;
+        }
+        for (let i = 0; i < this.bezierPointsNumber; i++) {
+            this.bezierPoints[i][0] *= width / this.width;
+            this.bezierPoints[i][1] *= height / this.height;
+        }
+        super.resize(width, height);
+    }
+
     static fromJSON(obj) {
         var dragTarget = new DragTarget([], obj.radius, obj.width, obj.height);
         dragTarget.x = obj.x;

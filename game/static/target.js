@@ -15,13 +15,15 @@ export class Target {
     }
 
     resize(width, height) {
-        var dWidth = (width - this.width) / this.width;
-        var dHeight = (height - this.height) / this.height;
-        var biggerChange = Math.max(dWidth, dHeight);
-
+        this.x *= (width / this.width);
+        this.y *= (height / this.height);
+        if (width < height) {
+            this.radius *= (width / this.width);
+        }
+        else {
+            this.radius *= (height / this.height);
+        }
         this.width = width;
         this.height = height;
-        //this.radius *= 1 + biggerChange;
-
     }
 }
