@@ -31,8 +31,6 @@ export class DragTarget extends ClickTarget {
         for (let i = this.bezierPointsNumber - 2; i >= 0; i--) {
             this.sufixSumOfDistances[i] = this.sufixSumOfDistances[i + 1] + Target.distanceOfTwoPoints(this.bezierPoints[i][0], this.bezierPoints[i][1], this.bezierPoints[i + 1][0], this.bezierPoints[i + 1][1]);
         }
-        console.log(this.sufixSumOfDistances);
-        console.log(this.prefixSumOfDistances);
     }
 
     awardPoints() {
@@ -157,13 +155,25 @@ export class DragTarget extends ClickTarget {
             ctx.beginPath();
             ctx.arc(this.bezierPoints[i][0], this.bezierPoints[i][1], 2, 0, 2 * Math.PI);
             ctx.fill();
-            //ctx.closePath();
         }
 
         super.draw(ctx);
     }
 
-    
+    static fromJSON(obj) {
+        var dragTarget = new DragTarget([], obj.radius, obj.width, obj.height);
+        dragTarget.x = obj.x;
+        dragTarget.y = obj.y;
+        dragTarget.alive = obj.alive;
+        dragTarget.dragging = obj.dragging;
+        dragTarget.bezierControlPoints = obj.bezierControlPoints;
+        dragTarget.currentBezierPointIndex = obj.currentBezierPointIndex;
+        dragTarget.bezierPointsNumber = obj.bezierPointsNumber;
+        dragTarget.bezierPoints = obj.bezierPoints;
+        dragTarget.prefixSumOfDistances = obj.prefixSumOfDistances;
+        dragTarget.sufixSumOfDistances = obj.sufixSumOfDistances;
 
+        return dragTarget;
+    }
 }
         

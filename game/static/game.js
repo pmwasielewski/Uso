@@ -6,26 +6,41 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
 var sumOfPoints = 0;
-var dragging = false;
+var targets = [];
+var target1 = new ClickTarget(targets, 100, canvas.width, canvas.height);
+console.log(target1);
 
+targets = await fetch('targets.json')
+    .then(response => response.json())
+    .catch(error => console.error(error));
+console.log(targets);
+
+targets.forEach((target, index) => { 
+    if (target.hasOwnProperty('bezierControlPoints')) {
+        targets[index] = DragTarget.fromJSON(target);
+    } else {
+        targets[index] = ClickTarget.fromJSON(target);
+    }
+    if (targets[index] instanceof Target) console.log('Target is an instance of Target');
+ });
+console.log(targets);
 
 window.requestAnimationFrame(draw);
     
 function resizeCanvas() {
     canvas.width = window.innerWidth - 100;
     canvas.height = window.innerHeight - 100;
+    targets.forEach(target => { target.resize(canvas.width, canvas.height); });
 }
 
 // Ustawienie rozmiaru canvas na początku
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-//var target1 = new Target(100, 100, 50);
-var targets = [];
-for (let i = 0; i < 3; i++) {
-    var target = new DragTarget(targets, 100, canvas.width, canvas.height);
-    targets.push(target);
-}
+// for (let i = 0; i < 3; i++) {
+//     var target = new DragTarget(targets, 100, canvas.width, canvas.height);
+//     targets.push(target);
+// }
 
 
 function draw() {
@@ -84,14 +99,6 @@ canvas.addEventListener('mousemove', function(event) {
         }
     }
     targets = targets.filter(target => target.alive == true);
-
-    
-});
-
-canvas.addEventListener('click', function(event) {
-    var rect = canvas.getBoundingClientRect();
-    var x = event.clientX - rect.left;  // X współrzędna względem lewego górnego rogu canvas
-    var y = event.clientY - rect.top;   // Y współrzędna względem lewego górnego rogu canvas
 });
 
 canvas.addEventListener('mousedown', function(event) {

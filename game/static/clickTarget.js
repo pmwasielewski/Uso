@@ -2,18 +2,18 @@ import { Target } from './target.js';
 
 export class ClickTarget extends Target {
     constructor(targets, radius, width, height) {
-        super(targets, radius, width, height);
+        super(radius, width, height);
 
-        this.randomizePosition();
+        this.randomizePosition(targets);
     }
 
-    randomizePosition() {
+    randomizePosition(targets) {
         var x = Math.random() * (this.width - 2 * this.radius) + this.radius;
         var y = Math.random() * (this.height - 2 * this.radius) + this.radius;
 
-        for (let i = 0; i < this.targets.length; i++) {
-            if (this.targets[i].distance(x, y) < this.radius + this.targets[i].radius) {
-                return this.randomizePosition();
+        for (let i = 0; i < targets.length; i++) {
+            if (targets[i].distance(x, y) < this.radius + targets[i].radius) {
+                return this.randomizePosition(targets);
             }
         }
         this.x = x;
@@ -90,5 +90,13 @@ export class ClickTarget extends Target {
         ctx.moveTo(this.x - this.radius, this.y);
         ctx.stroke();
         ctx.closePath();
+    }
+
+    static fromJSON(obj) {
+        var target = new ClickTarget([], obj.radius, obj.width, obj.height);
+        target.x = obj.x;
+        target.y = obj.y;
+        target.alive = obj.alive;
+        return target;
     }
 }
