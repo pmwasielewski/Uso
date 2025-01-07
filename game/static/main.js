@@ -1,6 +1,6 @@
-import { Target } from './target.js';
-import { ClickTarget } from './clickTarget.js';
-import { DragTarget } from './dragTarget.js';
+import { Target } from './data/target.js';
+import { ClickTarget } from './data/clickTarget.js';
+import { DragTarget } from './data/dragTarget.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
