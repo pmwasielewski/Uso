@@ -28,8 +28,17 @@ console.log(targets);
 window.requestAnimationFrame(draw);
     
 function resizeCanvas() {
-    canvas.width = window.innerWidth - 100;
-    canvas.height = window.innerHeight - 100;
+    const style = getComputedStyle(canvas);
+    const top = parseInt(style.marginTop);
+    const left = parseInt(style.marginLeft);
+    const right = parseInt(style.marginRight);
+    const bottom = parseInt(style.marginBottom);
+    const border = parseInt(style.border);
+
+    console.log(window.innerWidth, window.innerHeight);
+    canvas.width = window.innerWidth - left - right - 2 * border;
+    canvas.height = window.innerHeight - top - bottom - 2 * border;
+    console.log(canvas.width, canvas.height);
     targets.forEach(target => { target.resize(canvas.width, canvas.height); });
 }
 
@@ -37,15 +46,11 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// for (let i = 0; i < 3; i++) {
-//     var target = new DragTarget(targets, 100, canvas.width, canvas.height);
-//     targets.push(target);
-// }
-
-
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+    ctx.fillStyle = 'lightblue';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
     for (let i = 0; i < targets.length; i++) targets[i].draw(ctx);
     
     drawScore(sumOfPoints, ctx);

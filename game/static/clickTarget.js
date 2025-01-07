@@ -16,6 +16,8 @@ export class ClickTarget extends Target {
                 return this.randomizePosition(targets);
             }
         }
+        this.origX = x;
+        this.origY = y;
         this.x = x;
         this.y = y;
     }

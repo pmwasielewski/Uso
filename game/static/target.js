@@ -3,6 +3,7 @@ export class Target {
     constructor(radius, width, height) {
         this.width = width;
         this.height = height;
+        this.origScale  = {width: width, height: height, radius: radius};
         this.radius = radius;
         this.circleNumber = 10;
         this.colors = ['white', 'black', 'blue', 'orange', 'yellow']
@@ -17,12 +18,12 @@ export class Target {
     resize(width, height) {
         this.x *= (width / this.width);
         this.y *= (height / this.height);
-        if (width < height) {
-            this.radius *= (width / this.width);
-        }
-        else {
-            this.radius *= (height / this.height);
-        }
+    
+        //this.radius = this.origRadius * (width / this.width);
+        var widthScale = width / this.origScale.width;
+        var heightScale = height / this.origScale.height;
+        this.radius = this.origScale.radius * Math.min(widthScale, heightScale);
+        
         this.width = width;
         this.height = height;
     }

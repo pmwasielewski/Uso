@@ -2,4 +2,19 @@
     /* Ukrywa kursor na canvasie */
 #canvas {
     cursor: none;
+    margin-top: 150px;
+    margin-bottom: 50px;
+    margin-left: 100px;
+    margin-right: 100px;
 }
+
+body {
+    --display: flex; /* Ustawienie kontenera jako flexbox */
+    --justify-content: center; /* Wyśrodkowanie w poziomie */
+    --align-items: center; /* Wyśrodkowanie w pionie */
+    margin: 0; /* Usuń domyślne marginesy */
+    --background-color: #f0f0f0; /* Opcjonalne tło */
+    background-color: #725454;
+    padding: 0;
+    overflow: hidden;
+  }
