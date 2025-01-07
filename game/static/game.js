@@ -7,13 +7,12 @@ const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
 var sumOfPoints = 0;
 var targets = [];
-var target1 = new ClickTarget(targets, 100, canvas.width, canvas.height);
-console.log(target1);
+var lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
 
 targets = await fetch('targets.json')
     .then(response => response.json())
     .catch(error => console.error(error));
-console.log(targets);
+
 
 targets.forEach((target, index) => { 
     if (target.hasOwnProperty('bezierControlPoints')) {
@@ -23,7 +22,7 @@ targets.forEach((target, index) => {
     }
     if (targets[index] instanceof Target) console.log('Target is an instance of Target');
  });
-console.log(targets);
+
 
 window.requestAnimationFrame(draw);
     
@@ -35,11 +34,15 @@ function resizeCanvas() {
     const bottom = parseInt(style.marginBottom);
     const border = parseInt(style.border);
 
-    console.log(window.innerWidth, window.innerHeight);
+    // Ustawienie rozmiaru canvas
     canvas.width = window.innerWidth - left - right - 2 * border;
     canvas.height = window.innerHeight - top - bottom - 2 * border;
-    console.log(canvas.width, canvas.height);
+    
+    // Zmiana rozmiaru targetów
     targets.forEach(target => { target.resize(canvas.width, canvas.height); });
+
+    //zmiana pozycji serc
+    lives.x = canvas.width - 50;
 }
 
 // Ustawienie rozmiaru canvas na początku
@@ -54,6 +57,7 @@ function draw() {
     for (let i = 0; i < targets.length; i++) targets[i].draw(ctx);
     
     drawScore(sumOfPoints, ctx);
+    drawLives(lives, ctx);
     drawCrosshair(mouseCoords.x, mouseCoords.y, ctx);
     window.requestAnimationFrame(draw);
 }
@@ -84,7 +88,25 @@ function drawScore(points, ctx) {
     ctx.fillText('Score: ' + points, 10, 30);
 }
 
+function drawLives(lives, ctx) {
+    for (let i = 0; i < lives.count; i++) {
+        drawHeart(lives.x - i * lives.step, lives.y, ctx);
+    }
 
+}
+
+function drawHeart(x, y, ctx) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - 20, y - 25);
+    ctx.arc(x - 10, y - 25, 10, Math.PI, 2*Math.PI);
+    ctx.arc(x + 10, y - 25, 10, Math.PI, 2*Math.PI);
+    ctx.moveTo(x + 20, y - 25);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.fillStyle = 'red';
+    ctx.fill();
+}
 window.addEventListener('load', draw);
 
 canvas.addEventListener('mousemove', function(event) {
@@ -115,6 +137,7 @@ canvas.addEventListener('mousedown', function(event) {
         }
         if (i == targets.length - 1) {
             console.log('miss');
+            lives.count--;
         }
     }
     targets = targets.filter(target => target.alive == true);
