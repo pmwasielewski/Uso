@@ -10,7 +10,7 @@ var targets = [];
 var lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
 var time = 0;
 
-targets = await fetch('targets.json')
+targets = await fetch('./data/targets.json')
     .then(response => response.json())
     .catch(error => console.error(error));
 
