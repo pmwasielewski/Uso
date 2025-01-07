@@ -2,6 +2,8 @@
 
 To run the site on your local machine type:
 ```
+git checkout game
+cd game
 npm install
 npm start
 ```
