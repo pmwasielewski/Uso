@@ -8,6 +8,7 @@ var mouseCoords = {x: 0, y: 0};
 var sumOfPoints = 0;
 var targets = [];
 var lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
+var time = 0;
 
 targets = await fetch('targets.json')
     .then(response => response.json())
@@ -107,6 +108,8 @@ function drawHeart(x, y, ctx) {
     ctx.fillStyle = 'red';
     ctx.fill();
 }
+
+
 window.addEventListener('load', draw);
 
 canvas.addEventListener('mousemove', function(event) {
