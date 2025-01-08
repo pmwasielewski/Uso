@@ -11,7 +11,7 @@ export default class Game {
     }
 
     //path = '../data/targets.json'
-    async loadTargets(path) {
+    async loadTargets(path, width, height) {
         this.targets = await fetch(path)
             .then(response => response.json())
             .catch(error => console.error(error));
@@ -24,6 +24,8 @@ export default class Game {
                 this.targets[index] = ClickTarget.fromJSON(target);
             }
         });
+
+        this.resize(width, height);
     }
 
     resize(width, height) {

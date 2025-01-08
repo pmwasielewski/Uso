@@ -1,27 +1,18 @@
 import Game from './states/game.js';
+import Socket from './data/socket.js';
+import Menu from './states/menu.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
 var time = 0;
-var states = {menu: null, queue: null, game: new Game(), end: null};
-var currentState = states.game; //testy
-states.game.loadTargets('../data/targets.json');
+// canvas size: 800x600
+var states = {menu: new Menu(canvas.width, canvas.height), queue: null, game: null, end: null};
+var currentState = states.menu; //testy
 
 window.addEventListener('load', function() {
-    var socket = io();
-    socket.on('time', function(data) {
-        console.log(data);
-    });
-
-    socket.on('data', function(data) {
-        console.log('xd');
-        console.log(data);
-    });
-
-    draw();
+    Socket.configureSocket();
 });
-window.requestAnimationFrame(draw);
     
 function resizeCanvas() {
     const style = getComputedStyle(canvas);
@@ -38,14 +29,15 @@ function resizeCanvas() {
     
     currentState.resize(canvas.width, canvas.height);
 }
-
 // Ustawienie rozmiaru canvas na początku
 resizeCanvas();
+//states.game.loadTargets('../data/targets.json', canvas.width, canvas.height);
+window.requestAnimationFrame(draw);
 window.addEventListener('resize', resizeCanvas);
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'lightblue';
+    ctx.fillStyle = 'CadetBlue';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     currentState.draw(ctx);
