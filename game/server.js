@@ -1,7 +1,13 @@
 import express from 'express';
 import http from 'http';
+import { Server } from 'socket.io';
 
 var app = express();
+var server = http.createServer(app);
+var io = new Server(server);
+
+var userIds = [];
+
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('static'));
@@ -17,4 +23,27 @@ app.get('/play', function(req, res) {
 });
 
 
-http.createServer(app).listen(3000);
+server.listen(process.env.PORT || 3000);
+
+io.on('connection', function(socket) {
+    console.log('a user connected');
+    userIds.push(socket.id);
+    socket.on('disconnect', function() {
+        console.log('user disconnected');
+        userIds.splice(userIds.indexOf(socket.id), 1);
+    });
+    socket.on('chat message', function(msg) {
+        io.emit('chat message', msg, socket.id);
+    });
+});
+
+setInterval(() => {
+    io.emit('time', new Date().toTimeString());
+}, 1000);
+
+setInterval(() => {
+    for (var id of userIds) {
+        io.to(id).emit('data', userIds.length);
+    }
+}, 50);
+

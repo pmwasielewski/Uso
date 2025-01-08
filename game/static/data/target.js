@@ -1,5 +1,5 @@
 
-export class Target {
+export default class Target {
     constructor(radius, width, height) {
         this.width = width;
         this.height = height;

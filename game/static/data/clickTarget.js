@@ -1,6 +1,6 @@
-import { Target } from './target.js';
+import Target from './target.js';
 
-export class ClickTarget extends Target {
+export default class ClickTarget extends Target {
     constructor(targets, radius, width, height) {
         super(radius, width, height);
 

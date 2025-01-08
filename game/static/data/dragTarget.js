@@ -1,7 +1,7 @@
-import { ClickTarget } from "./clickTarget.js";
-import { Target } from "./target.js";
+import ClickTarget from "./clickTarget.js";
+import Target from "./target.js";
 
-export class DragTarget extends ClickTarget {
+export default class DragTarget extends ClickTarget {
     constructor(targets, radius, width, height) {
         super(targets, radius, width, height);
 
