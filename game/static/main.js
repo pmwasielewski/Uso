@@ -9,11 +9,30 @@ var time = 0;
 // canvas size: 800x600
 var states = {menu: new Menu(canvas.width, canvas.height), queue: null, game: null, end: null};
 var currentState = states.menu; //testy
+var gameInfo = {onlinePlayers: 0};
+var MenuOptionsToChoose = {'Quick start': 0, 'leaveQueue': 0};
+var socket = io();
 
 window.addEventListener('load', function() {
-    Socket.configureSocket();
-});
+    //Socket.configureSocket();
     
+    socket.on('time', function(data) {
+        //console.log(data);
+    });
+
+    socket.on('data', function(data) {
+        //console.log(data);
+        for (var key in data) {
+            gameInfo[key] = data[key];
+        }
+    });
+
+    socket.on('queueInfo', function(data) {
+        console.log(data);
+        gameInfo.queueLength = data.queueLength;
+    });
+});
+
 function resizeCanvas() {
     const style = getComputedStyle(canvas);
     const top = parseInt(style.marginTop);
@@ -35,12 +54,27 @@ resizeCanvas();
 window.requestAnimationFrame(draw);
 window.addEventListener('resize', resizeCanvas);
 
+//status check and send to server
+setInterval(() => {
+    if (MenuOptionsToChoose['Quick start'] === 1) {
+        console.log('joining queue');
+        socket.emit('joinQueue');
+        MenuOptionsToChoose['Quick start'] = 0;
+    }
+    else if (MenuOptionsToChoose['leaveQueue'] === 1) {
+        console.log('leaving queue');
+        socket.emit('leaveQueue');
+        MenuOptionsToChoose['leaveQueue'] = 0;
+    }
+
+}, 50);
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'CadetBlue';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    currentState.draw(ctx);
+    currentState.draw(ctx, gameInfo);
     drawCrosshair(mouseCoords.x, mouseCoords.y, ctx);
     window.requestAnimationFrame(draw);
 }
@@ -82,5 +116,11 @@ canvas.addEventListener('mousedown', function(event) {
 });
 
 canvas.addEventListener('mouseup', function(event) {
-    currentState.update('mouseUp', mouseCoords.x, mouseCoords.y);
+    var info = currentState.update('mouseUp', mouseCoords.x, mouseCoords.y);
+    if (info === 'Quick start') {
+        MenuOptionsToChoose['Quick start'] = 1;
+    }
+    else if (info === 'Waiting...') {
+        MenuOptionsToChoose['leaveQueue'] = 1;
+    }
 });

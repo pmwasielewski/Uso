@@ -33,6 +33,8 @@ io.on('connection', function(socket) {
     socket.on('disconnect', function() {
         console.log('user disconnected');
         userIds.splice(userIds.indexOf(socket.id), 1);
+        queue.splice(queue.indexOf(socket.id), 1);
+        
     });
 
     socket.on('chat message', function(msg) {
@@ -42,7 +44,13 @@ io.on('connection', function(socket) {
     socket.on('joinQueue', function() {
         socket.join('queue');
         queue.push(socket.id);
-        socket.emit('queueInfo', queue.length);
+        io.to('queue').emit('queueInfo', {queueLength: queue.length});
+    });
+
+    socket.on('leaveQueue', function() {
+        socket.leave('queue');
+        queue.splice(queue.indexOf(socket.id), 1);
+        io.to('queue').emit('queueInfo', {queueLength: queue.length});
     });
 
 });
@@ -53,7 +61,7 @@ setInterval(() => {
 
 setInterval(() => {
     for (var id of userIds) {
-        io.to(id).emit('data', userIds.length);
+        io.to(id).emit('data', {onlinePlayers: userIds.length});
     }
 }, 50);
 

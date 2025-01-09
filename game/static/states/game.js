@@ -62,7 +62,7 @@ export default class Game {
         ctx.fill();
     }
 
-    draw(ctx) {
+    draw(ctx, gameInfo) {
         for (let i = 0; i < this.targets.length; i++) this.targets[i].draw(ctx);
     
         this.drawScore(this.sumOfPoints, ctx);

@@ -25,7 +25,6 @@ export default class Button {
     }
 
     draw(ctx) {
-        console.log(this.symbol + 'lol');
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(this.x, this.y, this.iconWidth, this.iconHeight);
         
@@ -72,12 +71,12 @@ export default class Button {
                 break;
             
             case 'mouseDown':
-                if (x > this.x && x < this.x + this.iconWidth && y > this.y && y < this.y + this.iconHeight) {
-                    return this.symbol;
-                }
                 break;
 
             case 'mouseUp':
+                if (x > this.x && x < this.x + this.iconWidth && y > this.y && y < this.y + this.iconHeight) {
+                    return this.symbol;
+                }
                 break;
         }
     }

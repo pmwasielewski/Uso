@@ -14,6 +14,16 @@ export default class Button {
         this.canvasHeight = canvasHeight;
         this.fontSize = 10;
         this.currentTextColor = this.textColor;
+        this.time = 0;
+        setInterval(() => {
+            if (this.text === 'Waiting...' && (this.time == 0 || (this.time+1) % 10 == 0)) {
+                this.time += 1;
+                this.resizeFont(this.text);
+                this.time -= 1;
+            }
+            this.time += 1;
+        }, 1000);
+        this.resizeFont(this.text);
     }
 
     resize(width, height) {
@@ -25,23 +35,39 @@ export default class Button {
         this.canvasHeight = height;
         this.fontSize = 10;
 
+        this.resizeFont(this.text);
+    }
+
+    resizeFont(text) {
+        if (text === 'Waiting...') {
+            text = text + ' ' + this.time + "s. " + "Players in queue: _";
+        }
+
+
         var ctx = document.getElementById('canvas').getContext('2d');
         ctx.font = `${this.fontSize}px Arial`;
-        while (ctx.measureText(this.text).width < 2*this.buttonWidth/3 && this.fontSize * 1.2 < this.buttonHeight) {
-            console.log(this.text + this.fontSize);
+        while (ctx.measureText(text).width < this.buttonWidth-5 && this.fontSize * 1.6 < this.buttonHeight) {
             this.fontSize++; // Zwiększaj rozmiar czcionki
             ctx.font = `${this.fontSize}px Arial`;
         }
         this.fontSize--;
     }
 
-    draw(ctx) {
+    draw(ctx, gameInfo) {
+        var text = this.text;
+        if (this.text === 'Waiting...') {
+            if (gameInfo.queueLength !== undefined) {
+                text = text + ' ' + this.time + "s. Players in queue: " + gameInfo.queueLength;
+            } else
+            text = text + ' ' + this.time + "s. Players in queue: 1";
+        }
+
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(this.x, this.y, this.buttonWidth, this.buttonHeight);
         ctx.fillStyle = this.currentTextColor;
         ctx.font = `${this.fontSize}px Arial`;
-        var textWidth = ctx.measureText(this.text).width;
-        ctx.fillText(this.text, this.x + this.buttonWidth / 2 - textWidth / 2, this.y + this.buttonHeight / 2 + 10);
+        var textWidth = ctx.measureText(text).width;
+        ctx.fillText(text, this.x + this.buttonWidth / 2 - textWidth / 2, this.y + this.buttonHeight / 2 + this.buttonHeight / 10);
     }
 
     update(action, x, y) {
@@ -55,12 +81,12 @@ export default class Button {
                 break;
             
             case 'mouseDown':
-                if (x > this.x && x < this.x + this.buttonWidth && y > this.y && y < this.y + this.buttonHeight) {
-                    return this.text;
-                }
                 break;
 
             case 'mouseUp':
+                if (x > this.x && x < this.x + this.buttonWidth && y > this.y && y < this.y + this.buttonHeight) {
+                    return this.text;
+                }
                 break;
         }
     }
