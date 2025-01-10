@@ -11,7 +11,7 @@ export default class Menu {
         this.profile = new Icon(width - 70, 20, 50, 50, 'black', 'Aquamarine', 'grey', width, height, 'profile');
         //this.chat = new swipeWindow(100, 850, 200, 100, 'black', 'yellow', 'grey');
         //this.friends = new swipeWindow(100, 1000, 200, 100, 'black', 'yellow', 'grey');
-        this.serverStatus = new Label('', 5, height-25, 50, 20, 'black', width, height);
+        this.serverStatus = new Label('', 5, height-25, 100, 20, 'black', width, height);
         this.elements = [this.start, this.gameModes, this.instructions, this.ranking, this.profile, this.serverStatus];
         this.queue = false;
     }
@@ -27,7 +27,7 @@ export default class Menu {
     }
 
     draw(ctx, gameInfo) {
-        this.serverStatus.setText('Online players: ' + gameInfo.onlinePlayers);
+        this.serverStatus.setText('Online players: ' + gameInfo.onlinePlayers + ', Ping: ' + gameInfo.ping + 'ms');
         this.elements.forEach(element => element.draw(ctx, gameInfo));
     }
 

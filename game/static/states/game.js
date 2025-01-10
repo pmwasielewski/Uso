@@ -8,6 +8,10 @@ export default class Game {
         this.targets = [];
         this.lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
         this.gameInfo = gameInfo;
+
+        //server time of game start
+        this.time = this.gameInfo.serverTime;
+        
     }
 
     //path = '../data/targets.json'

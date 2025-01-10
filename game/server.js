@@ -8,6 +8,7 @@ var server = http.createServer(app);
 var io = new Server(server);
 
 var usersOnline = [];
+var usersData = {};
 var queue = [];
 var games = [];
 var gameId = 0;
@@ -56,6 +57,13 @@ function startGame(socket, game) {
 io.on('connection', function(socket) {
     console.log('a user connected');
     usersOnline.push(socket);
+    usersData[socket.id] = {};
+
+    //RTT calculation
+    socket.on('pong', function(data) {
+        usersData[socket.id].ping = Date.now() - data;
+    });
+
 
     socket.on('disconnect', userQuit(socket));
 
@@ -66,26 +74,25 @@ io.on('connection', function(socket) {
     socket.on('joinQueue', function() {
         socket.join('queue');
         queue.push(socket);
-        io.to('queue').emit('queueInfo', {queueLength: queue.length});
     });
 
     socket.on('leaveQueue', leaveQueue(socket));
 
 });
 
-setInterval(() => {
-    io.emit('time', new Date().toTimeString());
-}, 1000);
-
-
-//aktualizacja stanu serwera
-setInterval(() => {
-    //wysyłanie do graczy ich informacji
+function sendDataToPlayers() {
     for (var userSocket of usersOnline) {
-        userSocket.emit('data', {onlinePlayers: usersOnline.length});
+        var userData = usersData[userSocket.id];
+        userData.onlinePlayers = usersOnline.length;
+        if (queue.includes(userSocket)) {
+            userData.queueLength = queue.length;
+        }
+        
+        userSocket.emit('userData', userData);
     }
+}
 
-    //sprawdzanie czy są gracze w kolejce
+function checkQueue() {
     if (queue.length >= 2) {
         console.log('creating game');
         games.push({players: [queue[0].id, queue[1].id]}); //tu mozna zmienic na nick czy cos
@@ -97,5 +104,24 @@ setInterval(() => {
             startGame(PlayerSocket, currentGame);
         }
     }
-}, 50);
+}
 
+function RTT() {
+    for (var userSocket of usersOnline) {
+        userSocket.emit('ping', Date.now());
+    }
+}
+
+var loopCounter = 0;
+const sheduler = setInterval(() => {
+    if (loopCounter % 2 == 0) { //every 200ms
+        RTT();
+    }
+    else if (loopCounter % 5 == 0) { //every 500ms
+        sendDataToPlayers();
+    }
+    else if (loopCounter % 10 == 0) { //every 1s
+        checkQueue();
+    }
+    loopCounter++;
+}, 100);
