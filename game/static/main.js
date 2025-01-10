@@ -31,6 +31,13 @@ window.addEventListener('load', function() {
         console.log(data);
         gameInfo.queueLength = data.queueLength;
     });
+
+    socket.on('startGame', async function(gameInfo) {
+        console.log('game started');
+        states.game = new Game(gameInfo);
+        await states.game.loadTargets(canvas.width, canvas.height);
+        currentState = states.game;
+    });
 });
 
 function resizeCanvas() {

@@ -3,15 +3,16 @@ import ClickTarget from '../data/clickTarget.js';
 import DragTarget from '../data/dragTarget.js';
 
 export default class Game {
-    constructor() {
+    constructor(gameInfo) {
         this.sumOfPoints = 0;
         this.targets = [];
         this.lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
-
+        this.gameInfo = gameInfo;
     }
 
     //path = '../data/targets.json'
-    async loadTargets(path, width, height) {
+    async loadTargets(width, height) {
+        var path = this.gameInfo.path;
         this.targets = await fetch(path)
             .then(response => response.json())
             .catch(error => console.error(error));
