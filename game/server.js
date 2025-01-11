@@ -51,7 +51,10 @@ function startGame(socket, game) {
     var path = 'gameData/targets' + game.id + '.json'
     generateTargets(2, 5, './static/' + path);
     game.path = './' + path;
-    socket.emit('startGame', game);
+    game.playersEnded = 0;
+    game.scores = [];
+    //socket.emit('startGame', game);
+    socket.join(game.id);
 }
 
 io.on('connection', function(socket) {
@@ -78,12 +81,32 @@ io.on('connection', function(socket) {
 
     socket.on('leaveQueue', leaveQueue(socket));
 
+    socket.on('endGame', function(points) {
+        console.log('player ended game with ' + points + ' points');
+        usersData[socket.id].points = points;
+        //zapis do bazy
+        var game = games.find(game => game.players.includes(socket.id));
+        game.playersEnded++;
+        game.scores.push({id: socket.id, points: points});
+        if (game.playersEnded == game.players.length) {
+            games.splice(games.indexOf(game), 1);
+            game.scores.sort((a, b) => b.points - a.points);
+            io.to(game.id).emit('gameEnd', game.scores);
+            //usuwanie graczy z pokoju
+            for (var player of game.players) {
+                var playerSocket = usersOnline.find(user => user.id == player);
+                playerSocket.leave(game.id);
+            }
+        }
+    });
+
 });
 
 function sendDataToPlayers() {
     for (var userSocket of usersOnline) {
         var userData = usersData[userSocket.id];
         userData.onlinePlayers = usersOnline.length;
+        userData.serverTime = Date.now();
         if (queue.includes(userSocket)) {
             userData.queueLength = queue.length;
         }
@@ -98,11 +121,13 @@ function checkQueue() {
         games.push({players: [queue[0].id, queue[1].id]}); //tu mozna zmienic na nick czy cos
         var PlayersSocket = [queue[0], queue[1]];
         var currentGame = games[games.length-1];
-        currentGame.id = gameId++;
+        currentGame.id = 'game' + gameId;
+        gameId++;
         for (var PlayerSocket of PlayersSocket) {
             leaveQueue(PlayerSocket)();
             startGame(PlayerSocket, currentGame);
         }
+        io.to(currentGame.id).emit('startGame', currentGame);
     }
 }
 
@@ -117,10 +142,10 @@ const sheduler = setInterval(() => {
     if (loopCounter % 2 == 0) { //every 200ms
         RTT();
     }
-    else if (loopCounter % 5 == 0) { //every 500ms
+    if (loopCounter % 5 == 0) { //every 500ms
         sendDataToPlayers();
     }
-    else if (loopCounter % 10 == 0) { //every 1s
+    if (loopCounter % 10 == 0) { //every 1s
         checkQueue();
     }
     loopCounter++;

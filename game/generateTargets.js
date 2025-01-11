@@ -28,6 +28,6 @@ export default function generateTargets(dragTargetsCount, clickTargetCount, path
     var jsonTargets = JSON.stringify(targets, null, 4);
     //'./static/targets.json'
     fs.writeFileSync(pathFile, jsonTargets);
-    console.log('Targets generated and saved to targets.json');
+    console.log('Targets generated and saved to ' + pathFile);
     return targets;
 }

@@ -44,13 +44,17 @@ export default class Button {
         }
 
 
-        var ctx = document.getElementById('canvas').getContext('2d');
-        ctx.font = `${this.fontSize}px Arial`;
-        while (ctx.measureText(text).width < this.buttonWidth-5 && this.fontSize * 1.6 < this.buttonHeight) {
-            this.fontSize++; // Zwiększaj rozmiar czcionki
-            ctx.font = `${this.fontSize}px Arial`;
-        }
-        this.fontSize--;
+        // var ctx = document.getElementById('canvas').getContext('2d');
+        // ctx.font = `${this.fontSize}px "Courier New"`;
+        // while (ctx.measureText(text).width < this.buttonWidth-5 && this.fontSize * 1.6 < this.buttonHeight) {
+        //     this.fontSize++; // Zwiększaj rozmiar czcionki
+        //     ctx.font = `${this.fontSize}px "Courier New"`;
+        // }
+        // this.fontSize--;
+
+        var maxFontW = Math.floor(this.buttonWidth / (text.length * 0.65) );
+        var maxFontH = Math.floor(this.buttonHeight);
+        this.fontSize = Math.min(maxFontW, maxFontH);
     }
 
     draw(ctx, gameInfo) {
@@ -65,9 +69,9 @@ export default class Button {
         ctx.fillStyle = this.backgroundColor;
         ctx.fillRect(this.x, this.y, this.buttonWidth, this.buttonHeight);
         ctx.fillStyle = this.currentTextColor;
-        ctx.font = `${this.fontSize}px Arial`;
+        ctx.font = `${this.fontSize}px "Courier New"`;
         var textWidth = ctx.measureText(text).width;
-        ctx.fillText(text, this.x + this.buttonWidth / 2 - textWidth / 2, this.y + this.buttonHeight / 2 + this.buttonHeight / 10);
+        ctx.fillText(text, this.x + this.buttonWidth / 2 - textWidth / 2, this.y + this.buttonHeight/2 + this.fontSize/2);
     }
 
     update(action, x, y) {

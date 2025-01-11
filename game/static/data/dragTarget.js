@@ -31,6 +31,8 @@ export default class DragTarget extends ClickTarget {
         for (let i = this.bezierPointsNumber - 2; i >= 0; i--) {
             this.sufixSumOfDistances[i] = this.sufixSumOfDistances[i + 1] + Target.distanceOfTwoPoints(this.bezierPoints[i][0], this.bezierPoints[i][1], this.bezierPoints[i + 1][0], this.bezierPoints[i + 1][1]);
         }
+
+        this.maxPoints = 10;
     }
 
     awardPoints() {

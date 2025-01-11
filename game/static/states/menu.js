@@ -11,19 +11,13 @@ export default class Menu {
         this.profile = new Icon(width - 70, 20, 50, 50, 'black', 'Aquamarine', 'grey', width, height, 'profile');
         //this.chat = new swipeWindow(100, 850, 200, 100, 'black', 'yellow', 'grey');
         //this.friends = new swipeWindow(100, 1000, 200, 100, 'black', 'yellow', 'grey');
-        this.serverStatus = new Label('', 5, height-25, 100, 20, 'black', width, height);
+        this.serverStatus = new Label('', 5, height-55, 100, 50, 'black', width, height);
         this.elements = [this.start, this.gameModes, this.instructions, this.ranking, this.profile, this.serverStatus];
         this.queue = false;
     }
 
     resize(width, height) {
         this.elements.forEach(element => element.resize(width, height));
-    }
-
-    statusDraw(ctx, gameInfo) {
-        ctx.font = '30px Arial';
-        ctx.fillStyle = 'black';
-        ctx.fillText('Online players: ' + gameInfo.onlinePlayers, 10, 400);
     }
 
     draw(ctx, gameInfo) {
@@ -45,12 +39,12 @@ export default class Menu {
                     var optionChosen = this.elements[i].update('mouseUp', x, y);
                     if (optionChosen === 'Waiting...') {
                         this.elements[i] = new Button('Quick start', this.start.x, this.start.y, this.start.buttonWidth, this.start.buttonHeight, 'black', 'white', 'grey', this.start.canvasWidth, this.start.canvasHeight);
-                        return optionChosen;
+                        return {info: 'leaveQueue'};
                         
                     }
                     else if (optionChosen === 'Quick start') {
                         this.elements[i] = new Button('Waiting...', this.start.x, this.start.y, this.start.buttonWidth, this.start.buttonHeight, 'black', 'red', 'darkred', this.start.canvasWidth, this.start.canvasHeight);
-                        return optionChosen;
+                        return {info: 'joinQueue'};
                     }
                 }
                 break;

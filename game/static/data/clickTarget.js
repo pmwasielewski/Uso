@@ -5,6 +5,7 @@ export default class ClickTarget extends Target {
         super(radius, width, height);
 
         this.randomizePosition(targets);
+        this.maxPoints = 10;
     }
 
     randomizePosition(targets) {
@@ -36,7 +37,6 @@ export default class ClickTarget extends Target {
             var hitArea = Math.ceil(distance / areaThickness);
             var points = areas - hitArea + 1;
 
-            console.log(points);
             return points;
         }
     }

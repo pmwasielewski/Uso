@@ -1,17 +1,28 @@
 import Target from '../data/target.js';
 import ClickTarget from '../data/clickTarget.js';
 import DragTarget from '../data/dragTarget.js';
+import Label from '../data/label.js';
 
 export default class Game {
-    constructor(gameInfo) {
+    constructor(gameInfo, width, height) {
         this.sumOfPoints = 0;
         this.targets = [];
         this.lives = {count: 3, x: canvas.width - 50, y: 50, step: 50};
         this.gameInfo = gameInfo;
+        this.timeLabel = new Label('time', width - 100, height - 50, 90, 30, 'black', width, height);
+        this.maxPoints = 0;
+        this.gameEnded = false;
 
         //server time of game start
-        this.time = this.gameInfo.serverTime;
+        this.serverStartTime = this.gameInfo.serverTime - this.gameInfo.ping / 2;
+        this.clientStartTime = Date.now();
+        this.timeElapsed = 0;
         
+
+        // this.interval = setInterval(() => {
+        //     this.timeElapsed = Date.now() - this.clientTime;
+
+        // }, 50);
     }
 
     //path = '../data/targets.json'
@@ -28,6 +39,7 @@ export default class Game {
             } else {
                 this.targets[index] = ClickTarget.fromJSON(target);
             }
+            this.maxPoints += this.targets[index].maxPoints;
         });
 
         this.resize(width, height);
@@ -39,6 +51,8 @@ export default class Game {
 
         //zmiana pozycji serc
         this.lives.x = width - 50;
+
+        this.timeLabel.resize(width, height);
     }
 
     drawScore(points, ctx) {
@@ -68,10 +82,23 @@ export default class Game {
     }
 
     draw(ctx, gameInfo) {
-        for (let i = 0; i < this.targets.length; i++) this.targets[i].draw(ctx);
-    
+        if (this.gameEnded) return;
+
+        this.timeElapsed = Date.now() - this.clientStartTime;
+
+        //for (let i = 0; i < this.targets.length; i++) this.targets[i].draw(ctx);
+        this.targets[0].draw(ctx);
+
         this.drawScore(this.sumOfPoints, ctx);
         this.drawLives(this.lives, ctx);
+        this.timeLabel.setTimeText(this.timeElapsed);
+        this.timeLabel.draw(ctx);
+    }
+
+    gameOver() {
+        var points = ((this.sumOfPoints/this.maxPoints) * 100) / Math.pow((this.timeElapsed)/60000, 0.5);
+        this.gameEnded = true;
+        return {info: 'endGame', points: points};
     }
 
     update(action, x, y) {
@@ -113,6 +140,13 @@ export default class Game {
                 this.targets = this.targets.filter(target => target.alive == true);
                 break;
         }
+        if (this.gameEnded == false && (this.targets.length == 0 || this.lives.count == 0)) {
+            console.log('game over');
+            
+            return this.gameOver();
+        }
+
+        return null;
     }
 
 }
