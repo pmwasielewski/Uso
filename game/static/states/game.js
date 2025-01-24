@@ -1,4 +1,3 @@
-import Target from '../data/target.js';
 import ClickTarget from '../data/clickTarget.js';
 import DragTarget from '../data/dragTarget.js';
 import Label from '../data/label.js';
@@ -17,12 +16,6 @@ export default class Game {
         this.serverStartTime = this.gameInfo.serverTime - this.gameInfo.ping / 2;
         this.clientStartTime = Date.now();
         this.timeElapsed = 0;
-        
-
-        // this.interval = setInterval(() => {
-        //     this.timeElapsed = Date.now() - this.clientTime;
-
-        // }, 50);
     }
 
     //path = '../data/targets.json'
@@ -122,7 +115,7 @@ export default class Game {
                         break;
                     }
                     if (i == this.targets.length - 1) {
-                        console.log('miss');
+                        //console.log('miss');
                         this.lives.count--;
                     }
                 }
@@ -141,7 +134,7 @@ export default class Game {
                 break;
         }
         if (this.gameEnded == false && (this.targets.length == 0 || this.lives.count == 0)) {
-            console.log('game over');
+            //console.log('game over');
             
             return this.gameOver();
         }

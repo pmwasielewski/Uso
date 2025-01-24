@@ -17,6 +17,14 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('static'));
 
+function authorize(req, res, next) {
+    if (req.query.password == 'password') {
+        next();
+    } else {
+        res.send('wrong password');
+    }
+}
+
 
 app.get('/', function(req, res) {
     
@@ -53,6 +61,7 @@ function startGame(socket, game) {
     game.path = './' + path;
     game.playersEnded = 0;
     game.scores = [];
+    usersData[socket.id].game = game;
     //socket.emit('startGame', game);
     socket.join(game.id);
 }
@@ -88,10 +97,12 @@ io.on('connection', function(socket) {
         var game = games.find(game => game.players.includes(socket.id));
         game.playersEnded++;
         game.scores.push({id: socket.id, points: points});
+        game.scores.sort((a, b) => b.points - a.points);
+        //io.to(game.id).emit('gameEnd', game.scores);
+
         if (game.playersEnded == game.players.length) {
+            game.gameEnded = true;
             games.splice(games.indexOf(game), 1);
-            game.scores.sort((a, b) => b.points - a.points);
-            io.to(game.id).emit('gameEnd', game.scores);
             //usuwanie graczy z pokoju
             for (var player of game.players) {
                 var playerSocket = usersOnline.find(user => user.id == player);

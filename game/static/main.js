@@ -1,13 +1,14 @@
 import Game from './states/game.js';
 import Socket from './data/socket.js';
 import Menu from './states/menu.js';
+import EndGame from './states/endGame.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 var mouseCoords = {x: 0, y: 0};
 var response = null;
 // canvas size: 800x600
-var states = {menu: new Menu(canvas.width, canvas.height), queue: null, game: null, end: null};
+var states = {menu: new Menu(canvas.width, canvas.height), game: null, endGame: null};
 var currentState = states.menu; //testy
 var gameInfo = {onlinePlayers: 0, ping: 0};
 var socket = io();
@@ -21,18 +22,19 @@ window.addEventListener('load', function() {
 
     socket.on('userData', function(data) {
         //console.log(data);
-        gameInfo = data;
+        //gameInfo = data;
+        Object.assign(gameInfo, data);
     });
 
     socket.on('startGame', async function(gameInfo) {
-        console.log('game started');
+        //console.log('game started');
         states.game = new Game(gameInfo, canvas.width, canvas.height);
         await states.game.loadTargets(canvas.width, canvas.height);
         currentState = states.game;
     });
 
     socket.on('gameEnd', function(scores) {
-        console.log('game ended');
+        //console.log('game ended');
         
         if (scores.indexOf(scores.find(score => score.id === socket.id)) > 0) {
             console.log('You lost');
@@ -120,22 +122,26 @@ canvas.addEventListener('mouseup', function(event) {
 });
 
 function responseHandler(response) {
-    console.log(response);
+    //console.log(response);
     if (response == null) {
         return;
     }
     if (response.info === 'joinQueue') {
-        console.log('joining queue');
+        //console.log('joining queue');
         socket.emit('joinQueue');
     }
     else if (response.info === 'leaveQueue') {
-        console.log('leaving queue');
+        //console.log('leaving queue');
         socket.emit('leaveQueue');
     }
     else if (response.info === 'endGame') {
         var points = response.points;
-        console.log('ending game');
+        //console.log('ending game');
         socket.emit('endGame', points);
-        currentState = states.menu;
+        //states.endGame = new EndGame(gameInfo, canvas.width, canvas.height);
+        states.endGame = new EndGame(gameInfo, 800, 600, canvas.width, canvas.height, socket.id);
+        currentState = states.endGame;
     }
 }
+
+//wc generateTargets.js server.js ./views/* ./static/css/play.css  ./static/states/* ./static/main.js  ./static/data/*
