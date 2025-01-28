@@ -1,7 +1,14 @@
 import generateTargets from './generateTargets.js';
 import express from 'express';
 import http from 'http';
+import pkg from 'pg';
+const { Pool } = pkg;
 import { Server } from 'socket.io';
+import { createPool, listUsers, addUser } from './db.js';
+
+
+const pool = createPool();
+listUsers(pool);
 
 var app = express();
 var server = http.createServer(app);
