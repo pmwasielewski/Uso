@@ -5,6 +5,8 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import { Server } from 'socket.io';
 import { createPool, listUsers, addUser } from './db.js';
+import authorize from './authorize.js';
+import cookieParser from 'cookie-parser';
 
 
 const pool = createPool();
@@ -23,19 +25,16 @@ var gameId = 0;
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('static'));
-
-function authorize(req, res, next) {
-    if (req.query.password == 'password') {
-        next();
-    } else {
-        res.send('wrong password');
-    }
-}
-
+app.use(cookieParser('sgs90890s8g90as8rg90as8g9r8a0srg8'));
 
 app.get('/', function(req, res) {
-    
+
     res.render('index');
+});
+
+app.get('/login', function(req, res) {
+    
+    res.render('login');
 });
 
 app.get('/play', function(req, res) {
