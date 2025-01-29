@@ -4,9 +4,10 @@ import http from 'http';
 import pkg from 'pg';
 const { Pool } = pkg;
 import { Server } from 'socket.io';
-import { createPool, listUsers, addUser } from './db.js';
+import { createPool, listUsers, addUser, getUserPassword } from './db.js';
 import authorize from './authorize.js';
 import cookieParser from 'cookie-parser';
+import bcrypt from 'bcrypt';
 
 
 const pool = createPool();
@@ -25,20 +26,47 @@ var gameId = 0;
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('static'));
-app.use(cookieParser('sgs90890s8g90as8rg90as8g9r8a0srg8'));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser('thisNeedsToBeChangedInDeployment34234234'));
 
-app.get('/', function(req, res) {
-
-    res.render('index');
+app.get('/', authorize, function(req, res) {
+    res.render('index', { user : req.user });
 });
 
-app.get('/login', function(req, res) {
-    
+app.get('/login', function(req, res) { 
     res.render('login');
 });
 
+app.post('/login', async (req, res) => {
+    var username = req.body.txtUser;
+    var pwd = req.body.txtPwd;
+
+    // This will be used for register
+    // var rounds = 12;
+    // var hash = await bcrypt.hash(pwd, rounds);
+    // console.log(hash)
+
+    const userPassword = await getUserPassword(pool, username);
+    var result = await bcrypt.compare(pwd, userPassword);
+
+    if (result) {
+        res.cookie('user', username, { signed: true });
+        var returnUrl = req.query.returnUrl;
+        res.redirect(returnUrl);
+    } else {
+        res.render('login', { message: "Zła nazwa logowania lub hasło" }
+        );
+    }
+});
+
+app.get( '/logout', authorize, (req, res) => {
+    res.cookie('user', '', { maxAge: -1 } );
+    res.redirect('/')
+    });
+
+
 app.get('/play', function(req, res) {
-    res.render('play');
+    res.render('play', { user : req.user });
 });
 
 

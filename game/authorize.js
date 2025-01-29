@@ -4,7 +4,7 @@
 * @param {http.ServerResponse} res
 * @param {*} next
 */
-export function authorize(req, res, next) {
+export default function authorize(req, res, next) {
     if (req.signedCookies.user) {
         req.user = req.signedCookies.user;
         next();

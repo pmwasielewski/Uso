@@ -2,7 +2,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 
 export function createPool() {
-    
+
 }
 
 export async function addUser(pool, nick) {
@@ -15,11 +15,20 @@ export async function listUsers(pool) {
     });
 }
 
+export async function getUserPassword(pool, nick) {
+    const result = await pool.query(
+        'SELECT password FROM "Players" WHERE nick = $1',
+        [nick]
+    );
+    return result.rows[0]?.password;
+}
+
 //addUser('Kuba');
 //await listUsers(createPool());
 
 export default {
     createPool,
     addUser,
-    listUsers
+    listUsers,
+    getUserPassword
 }
