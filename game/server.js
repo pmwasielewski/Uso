@@ -4,15 +4,12 @@ import http from 'http';
 import pkg from 'pg';
 const { Pool } = pkg;
 import { Server } from 'socket.io';
-import { createPool, listUsers, addUser, getUserPassword } from './db.js';
+import { createPool, listUsers, addUser, getUserPassword, checkNickExists} from './db.js';
 import authorize from './authorize.js';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcrypt';
 
-
 const pool = createPool();
-listUsers(pool);
-
 var app = express();
 var server = http.createServer(app);
 var io = new Server(server);
@@ -37,14 +34,13 @@ app.get('/login', function(req, res) {
     res.render('login');
 });
 
+app.get('/register', function(req, res) { 
+    res.render('register');
+});
+
 app.post('/login', async (req, res) => {
     var username = req.body.txtUser;
     var pwd = req.body.txtPwd;
-
-    // This will be used for register
-    // var rounds = 12;
-    // var hash = await bcrypt.hash(pwd, rounds);
-    // console.log(hash)
 
     const userPassword = await getUserPassword(pool, username);
     var result = await bcrypt.compare(pwd, userPassword);
@@ -52,11 +48,37 @@ app.post('/login', async (req, res) => {
     if (result) {
         res.cookie('user', username, { signed: true });
         var returnUrl = req.query.returnUrl;
-        res.redirect(returnUrl);
+        if (returnUrl){
+            res.redirect(returnUrl);
+        }else{
+            res.redirect('/')
+        }
+        
     } else {
-        res.render('login', { message: "Zła nazwa logowania lub hasło" }
-        );
+        res.render('login', { message: "Zła nazwa logowania lub hasło" });
     }
+});
+
+app.post('/register', async (req, res) => {
+    var username = req.body.txtUser;
+    var pwd = req.body.txtPwd;
+
+    if (username.length >= 15) {
+        return res.render('register', { message: "Nick nie może być dłuższy niż 15 znaków." });
+    }
+
+    var check = await checkNickExists(pool, username)
+    if (check) {
+        return res.render('register', { message: "Użytkownik o podanym nicku już istnieje." });
+    }
+
+    var rounds = 12;
+    var hash = await bcrypt.hash(pwd, rounds);
+
+    await addUser(pool, username, hash);
+
+    res.redirect('login');
+
 });
 
 app.get( '/logout', authorize, (req, res) => {
@@ -65,7 +87,7 @@ app.get( '/logout', authorize, (req, res) => {
     });
 
 
-app.get('/play', function(req, res) {
+app.get('/play', authorize, function(req, res) {
     res.render('play', { user : req.user });
 });
 

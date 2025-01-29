@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     <style>
         body {
             margin: 0;
@@ -87,7 +87,7 @@
             text-align: center;
         }
 
-        .login-account-text {
+        .create-account-text {
             color: #166fe5;
             display: block;
             margin-bottom: 20px;
@@ -96,13 +96,6 @@
             font-size: xx-large;
         }
 
-        .create-account {
-            color: #1877f2;
-            text-decoration: none;
-            display: block;
-            margin-top: 20px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
@@ -110,14 +103,13 @@
         <div class="logo-box">
             <span class="logo-text">LOGO</span>
         </div>
-        
-        <div class="login-account-text">Zaloguj się</div>
-
+        <div class="create-account-text">Rejestracja konta</div>
         <form class="login-form" method="POST">
                 <div class="form-group">
                 <label for="username">Nick</label>
                 <input type="text" id="username" name="txtUser" required>
             </div>
+            
             <div class="form-group">
                 <label for="password">Hasło</label>
                 <input type="password" id="password" name="txtPwd" required>
@@ -127,8 +119,7 @@
                     <%= locals.message %>
                 </div>
             <% } %>
-            <button type="submit">Zaloguj</button>
-            <a href="/register" class="create-account">Utwórz konto</a>
+            <button type="submit">Zarejestruj</button>
         </form>
     </div>
 </body>
