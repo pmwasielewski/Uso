@@ -8,6 +8,7 @@ import { createPool, listUsers, addUser, getUserPassword, checkNickExists} from 
 import authorize from './authorize.js';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcrypt';
+import config from './config.js';
 
 const pool = createPool();
 var app = express();
@@ -24,7 +25,7 @@ app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(express.static('static'));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser('thisNeedsToBeChangedInDeployment34234234'));
+app.use(cookieParser(config.COOKIE_SEED));
 
 app.get('/', authorize, function(req, res) {
     res.render('index', { user : req.user });

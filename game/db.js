@@ -1,8 +1,16 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-export function createPool() {
+import config from './config.js';
 
+export function createPool() {
+    return new Pool({
+        user: config.DB_USER,
+        host: config.DB_HOST,
+        database: config.DB,
+        password: config.DB_PASSWORD,
+        port: Number(config.DB_PORT),
+    });
 }
 
 export async function addUser(pool, nick, password) {
