@@ -1,14 +1,116 @@
-<!-- index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            /* background-color: #ffffff; */
+            background-color: #f0f2f5;
+            height: 100vh;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 20px;
+            background-color: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #1565C0;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .welcome-text {
+            color: #1976D2;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .logo {
+            width: 600px;
+            height: auto;
+        }
+
+        .play-btn {
+            padding: 20px 50px;
+            font-size: 1.5em;
+            background-color: #1976D2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .play-btn:hover {
+            background-color: #1565C0;
+        }
+
+        .leaderboard {
+            position: fixed;
+            right: 20px;
+            top: 20%;
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            width: 250px;
+        }
+
+        .leaderboard h2 {
+            color: #1976D2;
+            margin-bottom: 15px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #1976D2;
+        }
+    </style>
 </head>
-
 <body>
-    Witaj, jesteś zalogowany jako <%= user %>. <a href='/logout'>Wyloguj się</a>
-</body>
+    <button class="logout-btn">Log Out</button>
 
+    <div class="main-content">
+        <h1 class="welcome-text">Welcome <%= user %></h1>
+        <img src="/img/logoGray.png" alt="USO" class="logo">
+        <button class="play-btn">Zagraj teraz</button>
+    </div>
+
+    <div class="leaderboard">
+        <h2>Leaderboard</h2>
+        <% leaderboard.forEach(entry => { %>
+            <div class="leaderboard-entry">
+                <span><%= entry.name %></span>
+                <span><%= entry.time %>s</span>
+            </div>
+        <% }); %>
+    </div>
+</body>
 </html>

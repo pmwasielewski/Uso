@@ -28,7 +28,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(config.COOKIE_SEED));
 
 app.get('/', authorize, function(req, res) {
-    res.render('index', { user : req.user });
+    res.render('index', {
+        user: req.user,
+        leaderboard: [
+            { name: "Player1", time: 120 },
+            { name: "Player2", time: 125 },
+            { name: "Player3", time: 130 },
+            { name: "Player4", time: 135 },
+            { name: "Player5", time: 140 }
+        ]
+    });
 });
 
 app.get('/login', function(req, res) { 
