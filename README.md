@@ -8,4 +8,3 @@ npm install
 npm start
 ```
 The site will be available at `localhost:3000`
-(Only visible site is 'localhost:3000/play')
