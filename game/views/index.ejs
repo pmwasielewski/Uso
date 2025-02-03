@@ -92,15 +92,23 @@
             margin-bottom: 10px;
             color: #1976D2;
         }
+        .play-btn-link {
+            text-decoration: none;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
-    <button class="logout-btn">Log Out</button>
+    <a href="/logout" class="play-btn-link">
+        <button class="logout-btn">Wyloguj się</button>
+    </a>   
 
     <div class="main-content">
         <h1 class="welcome-text">Welcome <%= user %></h1>
         <img src="/img/logoGray.png" alt="USO" class="logo">
-        <button class="play-btn">Zagraj teraz</button>
+        <a href="/play" class="play-btn-link">
+            <button class="play-btn">Zagraj teraz</button>
+        </a>    
     </div>
 
     <div class="leaderboard">
