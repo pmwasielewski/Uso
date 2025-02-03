@@ -18,6 +18,7 @@ const nick = window.userData;
 window.addEventListener('load', function() {
     //Socket.configureSocket();
     //console.log(this.window.userData);
+    socket.emit('nickname', nick);
     
     socket.on('ping', function(data) {
         socket.emit('pong', data);
@@ -41,11 +42,11 @@ window.addEventListener('load', function() {
         
         if (scores.indexOf(scores.find(score => score.id === socket.id)) > 0) {
             console.log('You lost');
-            socket.emit('addLoss', nick);
+            //socket.emit('addLoss', nick);
         }
         else {
             console.log('You won');
-            socket.emit('addWin', nick);
+            //socket.emit('addWin', nick);
         }
 
     });
@@ -144,7 +145,7 @@ function responseHandler(response) {
         //console.log('ending game');
         socket.emit('endGame', points);
         //states.endGame = new EndGame(gameInfo, canvas.width, canvas.height);
-        states.endGame = new EndGame(gameInfo, 800, 600, canvas.width, canvas.height, socket.id);
+        states.endGame = new EndGame(gameInfo, 800, 600, canvas.width, canvas.height, nick);
         currentState = states.endGame;
     }
 }

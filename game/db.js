@@ -61,7 +61,7 @@ export async function getLeaderboard(pool) {
         'SELECT nick, wins FROM "Players" ORDER BY wins DESC LIMIT 5'
     );
 
-    console.log(result.rows);
+    //console.log(result.rows);
 
     return result.rows;
 }

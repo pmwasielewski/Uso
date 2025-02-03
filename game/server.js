@@ -45,8 +45,6 @@ app.use(cookieParser(config.COOKIE_SEED));
 
 app.get('/', authorize, async function(req, res) {
     var leaders = await getLeaderboard(pool);
-    console.log(leaders);
-
     res.render('index', {
         user: req.user,
         // leaderboard: [
@@ -123,7 +121,6 @@ app.get( '/logout', authorize, (req, res) => {
 
 
 app.get('/play', authorize, function(req, res) {
-    console.log(req.user + ' connected');
     res.render('play', { user : req.user, pool: pool });
 });
 
@@ -169,6 +166,10 @@ io.on('connection', function(socket) {
     usersOnline.push(socket);
     usersData[socket.id] = {};
 
+    socket.on('nickname', function(nick) {
+        socket.nickname = nick;
+    });
+
     //RTT calculation
     socket.on('pong', function(data) {
         usersData[socket.id].ping = Date.now() - data;
@@ -192,31 +193,32 @@ io.on('connection', function(socket) {
         console.log('player ended game with ' + points + ' points');
         usersData[socket.id].points = points;
         //zapis do bazy
-        var game = games.find(game => game.players.includes(socket.id));
+        var game = games.find(game => game.players.includes(socket.nickname));
         game.playersEnded++;
-        game.scores.push({id: socket.id, points: points});
+        game.scores.push({nick: socket.nickname, points: points});
         game.scores.sort((a, b) => b.points - a.points);
         //io.to(game.id).emit('gameEnd', game.scores);
 
         if (game.playersEnded == game.players.length) {
             game.gameEnded = true;
             games.splice(games.indexOf(game), 1);
+
+            for (var score of game.scores) {
+                if (score.nick == game.scores[0].nick) {
+                    addWin(pool, score.nick);
+                }
+                else {
+                    addLoss(pool, score.nick);
+                }
+            }
+
             //usuwanie graczy z pokoju
             for (var player of game.players) {
-                var playerSocket = usersOnline.find(user => user.id == player);
+                var playerSocket = usersOnline.find(user => user.nickname == player);
                 io.to(game.id).emit('gameEnd', game.scores);
                 playerSocket.leave(game.id);
             }
         }
-    });
-
-    socket.on('addWin', async function(nick) {
-        await addWin(pool, nick);
-        console.log('win added');
-    });
-
-    socket.on('addLoss', async function(nick) {
-        await addLoss(pool, nick);
     });
 
 });
@@ -237,7 +239,8 @@ function sendDataToPlayers() {
 function checkQueue() {
     if (queue.length >= 2) {
         console.log('creating game');
-        games.push({players: [queue[0].id, queue[1].id]}); //tu mozna zmienic na nick czy cos
+        games.push({players: [queue[0].nickname, queue[1].nickname]}); //tu mozna zmienic na nick czy cos
+        console.log(games[games.length-1].players);
         var PlayersSocket = [queue[0], queue[1]];
         var currentGame = games[games.length-1];
         currentGame.id = 'game' + gameId;

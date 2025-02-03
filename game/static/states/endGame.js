@@ -10,6 +10,7 @@ export default class endGame {
         this.statHeight = 50;
         this.info = gameInfo;
         this.yourNick = yourNick;
+        this.timeToReturn = 5;
         
         this.statWidth = width - 2 * 50;
         this.boxX = 50;
@@ -25,8 +26,8 @@ export default class endGame {
             y += this.statHeight;
             var nick = gameInfo.game.players[i];
 
-            var score = gameInfo.game.scores.findIndex(score => score.id === nick).points || '';
-            var place = gameInfo.game.scores.findIndex(score => score.id === nick) + 1 || '';
+            var score = gameInfo.game.scores.findIndex(score => score.nick === nick).points || '';
+            var place = gameInfo.game.scores.findIndex(score => score.nick === nick) + 1 || '';
             var points = "";
             var color = "black";
             var time = "";
@@ -41,6 +42,14 @@ export default class endGame {
         this.refresh(gameInfo);
         this.i = setInterval(() => {
             this.refresh(gameInfo);
+            if (gameInfo.game.gameEnded) {
+                this.timeToReturn -= 1;
+                if (this.timeToReturn == 0) {
+                    clearInterval(this.i);
+                    location.reload();
+
+                }
+            }
         }, 1000);
     }
 
@@ -58,8 +67,6 @@ export default class endGame {
             this.stats[i].setSize(this.boxX, y, this.statWidth, this.statHeight);
             y += this.statHeight;
         }
-
-
         
     }
 
@@ -106,12 +113,13 @@ export default class endGame {
         for (let i = 1; i < this.stats.length; i++) {
             var nick = this.stats[i].nick;
             var color = "black";
-            if (nick === this.yourNick) {
+            console.log(nick, this.yourNick);
+            if (nick == this.yourNick) {
                 color = "red";
             }
-            var score = gameInfo.game.scores.find(score => score.id === nick);
+            var score = gameInfo.game.scores.find(score => score.nick === nick);
             score = score ? score.points : '';
-            var place = gameInfo.game.scores.findIndex(score => score.id === nick) + 1 || '';
+            var place = gameInfo.game.scores.findIndex(score => score.nick === nick) + 1 || '';
             var points = "";
             var time = "";
             this.stats[i].update(place, nick, score, time, points, color);
