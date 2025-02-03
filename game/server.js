@@ -56,6 +56,11 @@ app.post('/login', async (req, res) => {
     var username = req.body.txtUser;
     var pwd = req.body.txtPwd;
 
+    var check = await checkNickExists(pool, username)
+    if (!check) {
+        return res.render('login', { message: "Zła nazwa logowania lub hasło" });
+    }
+
     const userPassword = await getUserPassword(pool, username);
     var result = await bcrypt.compare(pwd, userPassword);
 
@@ -69,7 +74,7 @@ app.post('/login', async (req, res) => {
         }
         
     } else {
-        res.render('login', { message: "Zła nazwa logowania lub hasło" });
+        return res.render('login', { message: "Zła nazwa logowania lub hasło" });
     }
 });
 
