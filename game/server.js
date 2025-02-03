@@ -112,7 +112,7 @@ app.get('/play', authorize, function(req, res) {
 });
 
 
-server.listen(process.env.PORT || 3000);
+server.listen(process.env.PORT || Number(config.HTTP_PORT));
 
 function leaveQueue(socket) {
     return () => {

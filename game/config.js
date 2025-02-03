@@ -8,5 +8,6 @@ export default {
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_PORT: process.env.DB_PORT,
-  COOKIE_SEED: process.env.COOKIE_SEED
+  COOKIE_SEED: process.env.COOKIE_SEED,
+  HTTP_PORT: process.env.HTTP_PORT
 };
