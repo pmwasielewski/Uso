@@ -1,6 +1,8 @@
 import generateTargets from './generateTargets.js';
 import express from 'express';
 import http, { get } from 'http';
+import https from 'https';
+import fs from 'fs';
 import pkg from 'pg';
 const { Pool } = pkg;
 import { Server } from 'socket.io';
@@ -10,10 +12,24 @@ import cookieParser from 'cookie-parser';
 import bcrypt from 'bcrypt';
 import config from './config.js';
 
+const httpsOptions = {
+    key: fs.readFileSync('./cert/key.pem'),
+    cert: fs.readFileSync('./cert/cert.pem')
+};
+
+
+function redirectMiddleware(req, res) {
+    res.writeHead(301, { 
+        "Location": "https://" + req.headers['host'] + req.url 
+    });
+    res.end();
+}
+
 const pool = createPool();
 var app = express();
-var server = http.createServer(app);
-var io = new Server(server);
+var httpServer = http.createServer(redirectMiddleware);
+var httpsServer = https.createServer(httpsOptions, app);
+var io = new Server(httpsServer);
 
 var usersOnline = [];
 var usersData = {};
@@ -112,7 +128,13 @@ app.get('/play', authorize, function(req, res) {
 });
 
 
-server.listen(process.env.PORT || Number(config.HTTP_PORT));
+httpsServer.listen(Number(config.HTTPS_PORT), () => {
+    console.log(`HTTPS Server running on port`);
+});
+
+httpServer.listen(Number(config.HTTP_PORT), () => {
+    console.log(`HTTP Redirect server running on port`);
+});
 
 function leaveQueue(socket) {
     return () => {
