@@ -1,10 +1,10 @@
 import generateTargets from './generateTargets.js';
 import express from 'express';
-import http from 'http';
+import http, { get } from 'http';
 import pkg from 'pg';
 const { Pool } = pkg;
 import { Server } from 'socket.io';
-import { createPool, listUsers, addUser, getUserPassword, checkNickExists} from './db.js';
+import { createPool, listUsers, addUser, getUserPassword, checkNickExists, getLeaderboard, addLoss, addWin } from './db.js';
 import authorize from './authorize.js';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcrypt';
@@ -27,16 +27,20 @@ app.use(express.static('static'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(config.COOKIE_SEED));
 
-app.get('/', authorize, function(req, res) {
+app.get('/', authorize, async function(req, res) {
+    var leaders = await getLeaderboard(pool);
+    console.log(leaders);
+
     res.render('index', {
         user: req.user,
-        leaderboard: [
-            { name: "Player1", time: 120 },
-            { name: "Player2", time: 125 },
-            { name: "Player3", time: 130 },
-            { name: "Player4", time: 135 },
-            { name: "Player5", time: 140 }
-        ]
+        // leaderboard: [
+        //     { name: "Player1", time: 120 },
+        //     { name: "Player2", time: 125 },
+        //     { name: "Player3", time: 130 },
+        //     { name: "Player4", time: 135 },
+        //     { name: "Player5", time: 140 }
+        // ]
+        leaderboard: leaders
     });
 });
 
@@ -98,7 +102,8 @@ app.get( '/logout', authorize, (req, res) => {
 
 
 app.get('/play', authorize, function(req, res) {
-    res.render('play', { user : req.user });
+    console.log(req.user + ' connected');
+    res.render('play', { user : req.user, pool: pool });
 });
 
 
@@ -172,9 +177,19 @@ io.on('connection', function(socket) {
             //usuwanie graczy z pokoju
             for (var player of game.players) {
                 var playerSocket = usersOnline.find(user => user.id == player);
+                io.to(game.id).emit('gameEnd', game.scores);
                 playerSocket.leave(game.id);
             }
         }
+    });
+
+    socket.on('addWin', async function(nick) {
+        await addWin(pool, nick);
+        console.log('win added');
+    });
+
+    socket.on('addLoss', async function(nick) {
+        await addLoss(pool, nick);
     });
 
 });

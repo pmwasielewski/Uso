@@ -42,6 +42,30 @@ export async function checkNickExists(pool, nick) {
     return result.rows[0].exists;
 }
 
+export async function addWin(pool, nick) {
+    await pool.query(
+        'UPDATE "Players" SET wins = wins + 1 WHERE nick = $1',
+        [nick]
+    );
+}
+
+export async function addLoss(pool, nick) {
+    await pool.query(
+        'UPDATE "Players" SET losses = losses + 1 WHERE nick = $1',
+        [nick]
+    );
+}
+
+export async function getLeaderboard(pool) {
+    const result = await pool.query(
+        'SELECT nick, wins FROM "Players" ORDER BY wins DESC LIMIT 5'
+    );
+
+    console.log(result.rows);
+
+    return result.rows;
+}
+
 //addUser('Kuba');
 //await listUsers(createPool());
 
@@ -50,5 +74,8 @@ export default {
     addUser,
     listUsers,
     getUserPassword,
-    checkNickExists
+    checkNickExists,
+    addWin,
+    addLoss,
+    getLeaderboard
 }

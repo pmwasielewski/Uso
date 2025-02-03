@@ -2,6 +2,7 @@ import Game from './states/game.js';
 import Socket from './data/socket.js';
 import Menu from './states/menu.js';
 import EndGame from './states/endGame.js';
+//import { createPool, addLoss, addWin } from '../db.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -12,9 +13,11 @@ var states = {menu: new Menu(canvas.width, canvas.height), game: null, endGame: 
 var currentState = states.menu; //testy
 var gameInfo = {onlinePlayers: 0, ping: 0};
 var socket = io();
+const nick = window.userData;
 
 window.addEventListener('load', function() {
     //Socket.configureSocket();
+    //console.log(this.window.userData);
     
     socket.on('ping', function(data) {
         socket.emit('pong', data);
@@ -38,9 +41,11 @@ window.addEventListener('load', function() {
         
         if (scores.indexOf(scores.find(score => score.id === socket.id)) > 0) {
             console.log('You lost');
+            socket.emit('addLoss', nick);
         }
         else {
             console.log('You won');
+            socket.emit('addWin', nick);
         }
 
     });
